@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Listar productos{% endblock %}
+{% block title %}Editar{% endblock %}
 
 {% block content %}
-    <h1>Listar productos</h1>
+    <h1>Listar productos - Editar</h1>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Stock</th>
+                <th>Editar</th>
             </tr>
         </thead>
         <tbody>
@@ -18,6 +19,9 @@
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.precio }}</td>
                     <td>{{ producto.cantidad}}</td>
+                    <td>
+                        <a href="{% url 'editar' producto.id %}" class="btn btn-warning">Editar</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
