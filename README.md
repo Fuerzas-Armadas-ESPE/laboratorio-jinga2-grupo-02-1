@@ -1,6 +1,13 @@
 # Inventario en Django
 
 ## Descripción
+##comandos
+python -m venv venv
+.\venv\Scripts\activate
+pip install django
+python manage.py migrate
+python manage.py runserver
+
 
 Este proyecto es un inventario de productos, donde se pueden agregar, editar y eliminar productos. Además, se pueden ver los detalles de cada producto.
 

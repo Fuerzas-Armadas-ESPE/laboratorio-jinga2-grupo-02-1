@@ -1,5 +1,9 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from .models import Producto
+from django.http import HttpResponse
+import csv
+from .forms import CSVUploadForm
+
 
 productos = []
 
@@ -46,3 +50,39 @@ def eliminar_elemento(request, id):
     producto = get_object_or_404(Producto, id=id)
     producto.delete()
     return redirect('eliminar_productos')
+
+def exportar_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="productos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Nombre', 'Precio', 'Stock'])  # Escribe la cabecera del CSV
+
+    productos = Producto.objects.all().values_list('nombre', 'precio', 'cantidad')
+    for producto in productos:
+        writer.writerow(producto)  # Escribe los datos de cada producto
+
+    return response
+
+def importar_csv(request):
+    if request.method == 'POST':
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['file']
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+
+            for row in reader:
+                producto, created = Producto.objects.get_or_create(
+                    nombre=row['Nombre'],
+                    defaults={'precio': row['Precio'], 'cantidad': row['Stock']}
+                )
+                if not created:
+                    producto.precio = row['Precio']
+                    producto.cantidad = row['Stock']
+                    producto.save()
+
+            return redirect('listar_productos')
+    else:
+        form = CSVUploadForm()
+    return render(request, 'importar.html', {'form': form})
